@@ -23,3 +23,11 @@ android.debug.x86_64 = "res://bin/android/libRealSenseExtension.android.template
 android.release.x86_64 = "res://bin/android/libRealSenseExtension.android.template_release.x86_64.so"
 android.debug.arm64 = "res://bin/android/libRealSenseExtension.android.template_debug.arm64.so"
 android.release.arm64 = "res://bin/android/libRealSenseExtension.android.template_release.arm64.so"
+
+[dependencies]
+windows.debug = {
+	"res://bin/windows/realsense2.lib": ""
+}
+windows.release = {
+	"res://bin/windows/realsense2.lib": ""
+}

@@ -35,7 +35,17 @@ Run the following command to download godot-cpp:
 
 env = SConscript("godot-cpp/SConstruct", {"env": env, "customs": customs})
 
-env.Append(CPPPATH=["src/"])
+env.Append(CPPPATH=[
+    "src/",
+    "C:/Program Files (x86)/Intel RealSense SDK 2.0/include/"
+])
+env.Append(CCFLAGS=["-fexceptions"])
+env.Append(LIBPATH=[
+    "C:/Program Files (x86)/Intel RealSense SDK 2.0/lib/x64"
+])
+env.Append(LIBS=[
+    "realsense2"
+])
 sources = Glob("src/*.cpp")
 
 if env["target"] in ["editor", "template_debug"]:
