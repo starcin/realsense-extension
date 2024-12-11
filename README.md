@@ -15,7 +15,7 @@ This repository serves as a quickstart template for GDExtension development with
 To use this template, log in to GitHub and click the green "Use this template" button at the top of the repository page.
 This will let you create a copy of this repository with a clean git history. Make sure you clone the correct branch as these are configured for development of their respective Godot development branches and differ from each other. Refer to the docs to see what changed between the versions.
 
-For getting started after cloning your own copy to your local machine, you should: 
+For getting started after cloning your own copy to your local machine, you should:
 * initialize the godot-cpp git submodule via `git submodule update --init`
 * change the name of your library
   * change the name of the compiled library file inside the `SConstruct` file by modifying the `libname` string.
@@ -142,15 +142,15 @@ with the parameters from the matrix.
 
 As a result of this step, the binaries will be built in the `bin` folder (as specified in the SConstruct file). After all builds are completed, all individual builds will be merged into one common GDExtension-all zip that you can download.
 
-Note: for macos, you will have to build the binary as a `.dylib` in a `EXTENSION-NAME.framework` folder. The framework folder should also have a `Resources` folder with a file called `Info.plist`. Without this file, signing will fail.
+Note: for macos, you will have to build the binary as a `.dylib` in a `RealSenseExtension.framework` folder. The framework folder should also have a `Resources` folder with a file called `Info.plist`. Without this file, signing will fail.
 
 Note: for iOS, the same should be as for MacOS, however the `Info.plist` file needs to be close to the `.dylib`, instead of in a `Resources` folder (If this is not done, the build will fail to upload to the App Store).
 
 So, in our case, the builds should be:
 
 ```sh
-bin/EXTENSION-NAME.macos.template_debug.framework/EXTENSION-NAME.macos.template_release
-bin/EXTENSION-NAME.ios.template_debug.framework/EXTENSION-NAME.ios.template_release.arm64.dylib
+bin/RealSenseExtension.macos.template_debug.framework/RealSenseExtension.macos.template_release
+bin/RealSenseExtension.ios.template_debug.framework/RealSenseExtension.ios.template_release.arm64.dylib
 
 Afterwards, you want to set in the `.gdextension` file the paths to the `.framework` folder, instead of the `.dylib` file (Note that for the `.dylib` binary, the extension is not needed, you could have a file without any extension and it would still work).
 
