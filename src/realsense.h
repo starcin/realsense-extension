@@ -1,12 +1,12 @@
 #pragma once
 
-#include <godot_cpp/classes/object.hpp>
+#include <godot_cpp/classes/node.hpp>
 #include <librealsense2/rs.hpp>
 
 using namespace godot;
 
-class RealSense : public Object {
-	GDCLASS(RealSense, Object);
+class RealSense : public Node {
+	GDCLASS(RealSense, Node);
 
 private:
 	rs2::pipeline pipeline;
