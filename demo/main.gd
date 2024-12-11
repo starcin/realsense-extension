@@ -3,8 +3,9 @@ extends Node2D
 
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
-	var cammm = RealSense.new()
-	print(cammm.get_size())
+	var camera = RealSense.new()
+	camera.initialize(640, 480)
+	#print(cammm.get_size())
 	pass # Replace with function body.
 
 

@@ -26,8 +26,8 @@ android.release.arm64 = "res://bin/android/libRealSenseExtension.android.templat
 
 [dependencies]
 windows.debug = {
-	"res://bin/windows/realsense2.lib": ""
+	"res://bin/windows/realsense2.dll": ""
 }
 windows.release = {
-	"res://bin/windows/realsense2.lib": ""
+	"res://bin/windows/realsense2.dll": ""
 }
