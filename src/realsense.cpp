@@ -31,11 +31,14 @@ void RealSense::start() {
 
 void RealSense::initialize(int width, int height) {
 	UtilityFunctions::print("Starting RealSense");
+
 	configuration.enable_stream(RS2_STREAM_DEPTH, width, height);
 	configuration.enable_stream(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
 	depth_byte_array.resize(width * height * 2);
+	// Start the camera thread
 	std::thread camera_thread([this]() { start(); });
 	camera_thread.detach();
+
 	UtilityFunctions::print("RealSense started");
 }
 
@@ -58,21 +61,17 @@ void RealSense::fetch_depth_data() {
 			rs2::frameset frames = pipeline.wait_for_frames();
 			rs2::depth_frame depth_frame = frames.get_depth_frame();
 
-			// Emit the raw depth frame (or a wrapper object)
-			// call_deferred("emit_signal", "new_depth_frame", memnew(rs2::depth_frame(depth_frame)));
-
 			// Extract depth data
 			const int16_t* depth_data = (int16_t*)depth_frame.get_data();
 			int size = depth_frame.get_width() * depth_frame.get_height();
 
-			// // PackedByteArray result;
-			// result.resize(size * 2);
+			// Convert depth data to byte array
 			for (int i = 0; i < size; i++) {
 				depth_byte_array[i * 2] = depth_data[i] & 255;
 				depth_byte_array[i * 2 + 1] = (depth_data[i] >> 8) & 255;
 			}
 
-			// Emit the depth data signal
+			// Emit the signals
 			call_deferred("emit_signal", "new_depth_data", depth_byte_array);
 			call_deferred("emit_signal", "new_frame_ready");
 
