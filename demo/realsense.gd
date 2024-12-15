@@ -14,5 +14,5 @@ func _process(delta: float) -> void:
 
 
 func _on_initialized() -> void:
-	#print(self.get_size())
+	print(self.get_size())
 	pass # Replace with function body.

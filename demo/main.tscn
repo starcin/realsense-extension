@@ -1,20 +1,19 @@
-[gd_scene load_steps=3 format=3 uid="uid://dcerlmpw7ojm7"]
+[gd_scene load_steps=3 format=3 uid="uid://bto3jijdtjclp"]
 
-[ext_resource type="Script" path="res://main.gd" id="1_5c5we"]
-[ext_resource type="Script" path="res://realsense.gd" id="2_6tn4i"]
+[ext_resource type="Script" path="res://main.gd" id="1_38pjl"]
+[ext_resource type="Script" path="res://realsense.gd" id="2_46ad7"]
 
-[node name="Main" type="Node2D"]
-script = ExtResource("1_5c5we")
-
-[node name="Button" type="Button" parent="."]
-offset_left = 316.0
-offset_top = 188.0
-offset_right = 449.0
-offset_bottom = 239.0
+[node name="Node2D" type="Node2D"]
+script = ExtResource("1_38pjl")
 
 [node name="RealSense" type="RealSense" parent="."]
-script = ExtResource("2_6tn4i")
+script = ExtResource("2_46ad7")
 
-[connection signal="pressed" from="Button" to="." method="_on_button_pressed"]
+[node name="TextureRect" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(640, 480)
+offset_right = 40.0
+offset_bottom = 40.0
+
 [connection signal="initialized" from="RealSense" to="." method="_on_realsense_initialized"]
 [connection signal="initialized" from="RealSense" to="RealSense" method="_on_initialized"]
+[connection signal="new_frame_ready" from="RealSense" to="." method="_on_realsense_new_frame_ready"]
