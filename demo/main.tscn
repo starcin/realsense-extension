@@ -16,4 +16,4 @@ offset_bottom = 40.0
 
 [connection signal="initialized" from="RealSense" to="." method="_on_realsense_initialized"]
 [connection signal="initialized" from="RealSense" to="RealSense" method="_on_initialized"]
-[connection signal="new_frame_ready" from="RealSense" to="." method="_on_realsense_new_frame_ready"]
+[connection signal="new_depth_data" from="RealSense" to="." method="_on_realsense_new_depth_data"]

@@ -73,7 +73,7 @@ void RealSense::fetch_depth_data() {
 			}
 
 			// Emit the depth data signal
-			call_deferred("emit_signal", "new_depth_data", depth_data);
+			call_deferred("emit_signal", "new_depth_data", depth_byte_array);
 			call_deferred("emit_signal", "new_frame_ready");
 
 		} catch (const std::exception& e) {
