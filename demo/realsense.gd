@@ -5,6 +5,7 @@ extends RealSense
 func _ready() -> void:
 	print("starting init")
 	self.initialize(640, 480, true, true)
+	self.configure_depth_cropping(0.1, 2.0, -0.5, 0.5, -0.5, 0.5, false)
 	pass # Replace with function body.
 
 
