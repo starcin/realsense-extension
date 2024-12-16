@@ -31,16 +31,16 @@ void RealSense::start() {
 	call_deferred("emit_signal", "initialized");
 }
 
-void RealSense::initialize(int width, int height, bool enable_depth, bool enable_color) {
+void RealSense::initialize(int width, int height, bool will_capture_depth, bool will_capture_color) {
 	UtilityFunctions::print("Starting RealSense");
 
-	if (enable_depth) {
+	if (will_capture_depth) {
 		configuration.enable_stream(RS2_STREAM_DEPTH, width, height);
 		configuration.enable_stream(RS2_STREAM_ACCEL, RS2_FORMAT_MOTION_XYZ32F);
 		depth_byte_array.resize(width * height * 2);
 		is_depth_enabled = true;
 	}
-	if (enable_color) {
+	if (will_capture_color) {
 		configuration.enable_stream(RS2_STREAM_COLOR, width, height, RS2_FORMAT_RGB8, 30);
 		color_byte_array.resize(width * height * 3);
 		is_color_enabled = true;
