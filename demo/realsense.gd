@@ -4,7 +4,7 @@ extends RealSense
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	print("starting init")
-	self.initialize(640, 480)
+	self.initialize(640, 480, true, true)
 	pass # Replace with function body.
 
 

@@ -9,11 +9,23 @@ script = ExtResource("1_38pjl")
 [node name="RealSense" type="RealSense" parent="."]
 script = ExtResource("2_46ad7")
 
-[node name="TextureRect" type="TextureRect" parent="."]
+[node name="DepthTextureRect" type="TextureRect" parent="."]
 custom_minimum_size = Vector2(640, 480)
 offset_right = 40.0
 offset_bottom = 40.0
 
+[node name="ColorTextureRect" type="TextureRect" parent="."]
+custom_minimum_size = Vector2(640, 480)
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = 512.0
+offset_top = -3.0
+offset_right = 1152.0
+offset_bottom = 477.0
+grow_horizontal = 0
+
 [connection signal="initialized" from="RealSense" to="." method="_on_realsense_initialized"]
 [connection signal="initialized" from="RealSense" to="RealSense" method="_on_initialized"]
+[connection signal="new_color_data" from="RealSense" to="." method="_on_realsense_new_color_data"]
 [connection signal="new_depth_data" from="RealSense" to="." method="_on_realsense_new_depth_data"]
