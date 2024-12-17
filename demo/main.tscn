@@ -1,29 +1,74 @@
-[gd_scene load_steps=3 format=3 uid="uid://bto3jijdtjclp"]
+[gd_scene load_steps=10 format=3 uid="uid://bto3jijdtjclp"]
 
 [ext_resource type="Script" path="res://main.gd" id="1_38pjl"]
 [ext_resource type="Script" path="res://realsense.gd" id="2_46ad7"]
+[ext_resource type="Shader" path="res://depth_displacement.gdshader" id="3_d30va"]
+[ext_resource type="Texture2D" uid="uid://05dpf527gir6" path="res://icon.svg" id="4_0y1xh"]
 
-[node name="Node2D" type="Node2D"]
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_8l5td"]
+sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+ground_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
+
+[sub_resource type="Sky" id="Sky_3op6x"]
+sky_material = SubResource("ProceduralSkyMaterial_8l5td")
+
+[sub_resource type="Environment" id="Environment_opjvn"]
+background_mode = 2
+sky = SubResource("Sky_3op6x")
+tonemap_mode = 2
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gg81a"]
+render_priority = 0
+shader = ExtResource("3_d30va")
+shader_parameter/depth_texture = ExtResource("4_0y1xh")
+
+[sub_resource type="QuadMesh" id="QuadMesh_ryde7"]
+material = SubResource("ShaderMaterial_gg81a")
+size = Vector2(1.6, 1.2)
+subdivide_width = 640
+subdivide_depth = 480
+
+[node name="Node2D" type="Node3D"]
 script = ExtResource("1_38pjl")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866023, -0.433016, 0.250001, 0.422391, -0.366023, 0.829224, -0.267561, 0.823726, 0.499887, -0.213704, 0, 0.224109)
+shadow_enabled = true
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_opjvn")
 
 [node name="RealSense" type="RealSense" parent="."]
 script = ExtResource("2_46ad7")
 
-[node name="DepthTextureRect" type="TextureRect" parent="."]
-custom_minimum_size = Vector2(640, 480)
-offset_right = 40.0
-offset_bottom = 40.0
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(0.945464, 0.256239, 0.201094, -0.322975, 0.817557, 0.476747, -0.0422444, -0.515696, 0.85573, 0.440973, 1.90887, 0.775629)
 
-[node name="ColorTextureRect" type="TextureRect" parent="."]
-custom_minimum_size = Vector2(640, 480)
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="DepthTextureRect" type="TextureRect" parent="CanvasLayer"]
+visible = false
+custom_minimum_size = Vector2(320, 240)
+offset_right = 320.0
+offset_bottom = 240.0
+expand_mode = 1
+
+[node name="ColorTextureRect" type="TextureRect" parent="CanvasLayer"]
+visible = false
+custom_minimum_size = Vector2(320, 240)
 anchors_preset = 1
 anchor_left = 1.0
 anchor_right = 1.0
-offset_left = 512.0
-offset_top = -3.0
-offset_right = 1152.0
-offset_bottom = 477.0
+offset_left = -655.0
+offset_top = 2.0
+offset_right = -335.0
+offset_bottom = 242.0
 grow_horizontal = 0
+expand_mode = 1
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("QuadMesh_ryde7")
 
 [connection signal="initialized" from="RealSense" to="." method="_on_realsense_initialized"]
 [connection signal="initialized" from="RealSense" to="RealSense" method="_on_initialized"]

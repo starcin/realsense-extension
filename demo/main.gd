@@ -1,4 +1,4 @@
-extends Node2D
+extends Node3D
 
 var is_initialized = false
 var is_capturing = false
@@ -30,11 +30,14 @@ func _on_realsense_initialized() -> void:
 
 func _on_realsense_new_depth_data(data: PackedByteArray) -> void:
 	depth_image.set_data(640, 480, false, Image.FORMAT_RG8, data)
-	$DepthTextureRect.texture = ImageTexture.create_from_image(depth_image)
+	var texture : ImageTexture = ImageTexture.create_from_image(depth_image)
+	$CanvasLayer/DepthTextureRect.texture = texture
+	#$MeshInstance3D.set_instance_shader_parameter("depth_texture", texture)
+	$MeshInstance3D.get_active_material(0).set_shader_parameter("depth_texture", texture)
 	pass # Replace with function body.
 
 
 func _on_realsense_new_color_data(data: PackedByteArray) -> void:
 	color_image.set_data(640, 480, false, Image.FORMAT_RGB8, data)
-	$ColorTextureRect.texture = ImageTexture.create_from_image(color_image)
+	$CanvasLayer/ColorTextureRect.texture = ImageTexture.create_from_image(color_image)
 	pass # Replace with function body.
