@@ -10,10 +10,12 @@ void RealSense::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("get_size"), &RealSense::get_size);
 	ClassDB::bind_method(D_METHOD("get_depth_data"), &RealSense::get_depth_data);
 	ClassDB::bind_method(D_METHOD("get_color_data"), &RealSense::get_color_data);
+	ClassDB::bind_method(D_METHOD("get_vertices_data"), &RealSense::get_vertices_data);
 	ClassDB::bind_method(D_METHOD("start_capturing"), &RealSense::start_capturing);
 	ClassDB::bind_method(D_METHOD("stop_capturing"), &RealSense::stop_capturing);
 	ADD_SIGNAL(MethodInfo("new_depth_data", PropertyInfo(Variant::PACKED_BYTE_ARRAY, "data")));
 	ADD_SIGNAL(MethodInfo("new_color_data", PropertyInfo(Variant::PACKED_BYTE_ARRAY, "data")));
+	ADD_SIGNAL(MethodInfo("new_vertices_data", PropertyInfo(Variant::PACKED_VECTOR3_ARRAY, "data")));
 	ADD_SIGNAL(MethodInfo("new_frame_ready"));
 	ADD_SIGNAL(MethodInfo("initialized"));
 }
@@ -34,7 +36,7 @@ void RealSense::start() {
 	call_deferred("emit_signal", "initialized");
 }
 
-void RealSense::initialize(int width, int height, bool will_capture_color, bool will_capture_depth) {
+void RealSense::initialize(int width, int height, bool will_capture_color, bool will_capture_depth, bool will_capture_vertices) {
 	UtilityFunctions::print("Starting RealSense");
 
 	number_of_pixels = width * height;
@@ -50,9 +52,18 @@ void RealSense::initialize(int width, int height, bool will_capture_color, bool 
 		color_byte_array.resize(number_of_pixels * 3);
 		is_color_enabled = true;
 	}
+	if (will_capture_vertices) {
+		if (will_capture_depth) {
+			vertices_array.resize(number_of_pixels);
+			is_vertices_enabled = true;
+		}
+		else {
+			UtilityFunctions::print("Depth capturing should be enabled for the vertices to be captured.");
+		}
+	}
 	// Start the camera thread
 	std::thread camera_thread([this]() { start(); });
-	camera_thread.detach();
+	camera_thread.join();
 
 	UtilityFunctions::print("RealSense started");
 }
@@ -67,6 +78,7 @@ void RealSense::configure_depth_cropping(float nearDistance, float farDistance, 
 	depth_cropping_config.left_distance = leftDistance;
 	depth_cropping_config.right_distance = rightDistance;
 }
+
 Vector2i RealSense::get_size() {
 	rs2::frameset frames = pipeline.wait_for_frames();
 	rs2::depth_frame depth_frame = frames.get_depth_frame();
@@ -81,6 +93,10 @@ PackedByteArray RealSense::get_color_data() {
 	return color_byte_array;
 }
 
+PackedVector3Array RealSense::get_vertices_data() {
+	return vertices_array;
+}
+
 void RealSense::fetch_data() {
 	UtilityFunctions::print("Starting data loop");
 
@@ -93,11 +109,13 @@ void RealSense::fetch_data() {
 				// Extract depth data
 				const uint16_t* depth_data = (uint16_t*)depth_frame.get_data();
 				int size = depth_frame.get_width() * depth_frame.get_height();
-
+				const rs2::vertex* vertices;
+				rs2::points points;
+				if (is_vertices_enabled || will_crop_depth_data) {
+					points = pointcloud.calculate(depth_frame);
+					vertices = points.get_vertices();
+				}
 				if (will_crop_depth_data) {
-					rs2::points points = pointcloud.calculate(depth_frame);
-					const rs2::vertex* vertices = points.get_vertices();
-
 					if (will_reorient_before_cropping) {
 						rs2::motion_frame motion_frame = frames.first(RS2_STREAM_ACCEL);
 						rs2_vector motion_data = motion_frame.as<rs2::motion_frame>().get_motion_data();
@@ -145,6 +163,11 @@ void RealSense::fetch_data() {
 					for (int i = 0; i < size; i++) {
 						depth_byte_array[i * 2] = cropMask[i] ? depth_data[i] & 255 : 0;
 						depth_byte_array[i * 2 + 1] = cropMask[i] ? (depth_data[i] >> 8) & 255 : 0;
+						if (is_vertices_enabled) {
+							vertices_array[i].x = cropMask[i] ? vertices[i].x : 0;
+							vertices_array[i].y = cropMask[i] ? vertices[i].y : 0;
+							vertices_array[i].z = cropMask[i] ? vertices[i].z : 0;
+						}
 					}
 				}
 				else {
@@ -152,10 +175,18 @@ void RealSense::fetch_data() {
 					for (int i = 0; i < size; i++) {
 						depth_byte_array[i * 2] = depth_data[i] & 255;
 						depth_byte_array[i * 2 + 1] = (depth_data[i] >> 8) & 255;
+						if (is_vertices_enabled) {
+							vertices_array[i].x = vertices[i].x;
+							vertices_array[i].y = vertices[i].y;
+							vertices_array[i].z = vertices[i].z;
+						}
 					}
 				}
 				// Emit the signals
 				call_deferred("emit_signal", "new_depth_data", depth_byte_array);
+				if (is_vertices_enabled) {
+					call_deferred("emit_signal", "new_vertices_data", vertices_array);
+				}
 			}
 
 			if (is_color_enabled) {

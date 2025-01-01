@@ -3,7 +3,7 @@
 [ext_resource type="Script" path="res://main.gd" id="1_38pjl"]
 [ext_resource type="Script" path="res://realsense.gd" id="2_46ad7"]
 [ext_resource type="Shader" path="res://depth_displacement.gdshader" id="3_d30va"]
-[ext_resource type="Texture2D" uid="uid://05dpf527gir6" path="res://icon.svg" id="4_0y1xh"]
+[ext_resource type="Script" path="res://addons/goutte.camera.trackball/trackball_camera.gd" id="5_8rgus"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_8l5td"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -20,7 +20,6 @@ tonemap_mode = 2
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_gg81a"]
 render_priority = 0
 shader = ExtResource("3_d30va")
-shader_parameter/depth_texture = ExtResource("4_0y1xh")
 
 [sub_resource type="QuadMesh" id="QuadMesh_ryde7"]
 material = SubResource("ShaderMaterial_gg81a")
@@ -42,7 +41,7 @@ environment = SubResource("Environment_opjvn")
 script = ExtResource("2_46ad7")
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(0.945464, 0.256239, 0.201094, -0.322975, 0.817557, 0.476747, -0.0422444, -0.515696, 0.85573, 0.440973, 1.90887, 0.775629)
+transform = Transform3D(0.945464, 0.256239, 0.201094, -0.322975, 0.817557, 0.476747, -0.0422444, -0.515696, 0.85573, 0.858565, 2.89888, 2.55264)
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -67,10 +66,20 @@ grow_horizontal = 0
 expand_mode = 1
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
+visible = false
 mesh = SubResource("QuadMesh_ryde7")
+
+[node name="TrackballCamera" type="Camera3D" parent="."]
+transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, 0, 0, -3)
+current = true
+script = ExtResource("5_8rgus")
+stabilize_horizon = true
+zoom_minimum = 0.1
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
 
 [connection signal="initialized" from="RealSense" to="." method="_on_realsense_initialized"]
 [connection signal="initialized" from="RealSense" to="RealSense" method="_on_initialized"]
 [connection signal="new_color_data" from="RealSense" to="." method="_on_realsense_new_color_data"]
 [connection signal="new_depth_data" from="RealSense" to="." method="_on_realsense_new_depth_data"]
+[connection signal="new_vertices_data" from="RealSense" to="." method="_on_real_sense_new_vertices_data"]

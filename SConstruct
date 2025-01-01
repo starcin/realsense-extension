@@ -39,7 +39,7 @@ env.Append(CPPPATH=[
     "src/",
     "C:/Program Files (x86)/Intel RealSense SDK 2.0/include/"
 ])
-env.Append(CCFLAGS=["-fexceptions"])
+# env.Append(CCFLAGS=["-fexceptions"])
 env.Append(LIBPATH=[
     "C:/Program Files (x86)/Intel RealSense SDK 2.0/lib/x64",
     "C:/Program Files (x86)/Intel RealSense SDK 2.0/bin/x64"

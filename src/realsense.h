@@ -22,6 +22,7 @@ private:
 	bool is_running = false; // Flag to control the loop
 	bool is_depth_enabled = false;
 	bool is_color_enabled = false;
+	bool is_vertices_enabled = false;
 	bool will_crop_depth_data = false;
 	bool will_reorient_before_cropping = false;
 
@@ -30,6 +31,7 @@ private:
 	rs2::config configuration;
 	PackedByteArray depth_byte_array;
 	PackedByteArray color_byte_array;
+	PackedVector3Array vertices_array;
 	std::thread loop_thread; // Thread for the infinite loop
 	uint32_t number_of_pixels = 0;
 	void start();
@@ -39,11 +41,12 @@ protected:
 	static void _bind_methods();
 
 public:
-	void initialize(int width, int height, bool enable_color = true, bool enable_depth = true);
+	void initialize(int width, int height, bool enable_color = true, bool enable_depth = true, bool enable_vertices = true);
 	void configure_depth_cropping( float nearDistance, float farDistance, float downDistance, float upDistance, float leftDistance, float rightDistance, bool is_local = false);
 	Vector2i get_size();
 	PackedByteArray get_depth_data();
 	PackedByteArray get_color_data();
+	PackedVector3Array get_vertices_data();
 	void start_capturing();
 	void stop_capturing();
 	RealSense();

@@ -4,7 +4,7 @@ extends RealSense
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	print("starting init")
-	self.initialize(640, 480, true, true)
+	self.initialize(640, 480, true, true, true)
 	#self.configure_depth_cropping(0.1, 2.0, -0.5, 0.5, -0.5, 0.5, false)
 	pass # Replace with function body.
 
