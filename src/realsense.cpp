@@ -29,15 +29,15 @@ RealSense::~RealSense() {
 }
 
 void RealSense::start() {
-	UtilityFunctions::print("Starting camera");
+	UtilityFunctions::print("Starting pipeline");
 	pipeline.start(configuration);
 	is_initialized = true;
-	UtilityFunctions::print("Started camera");
+	UtilityFunctions::print("Started pipeline");
 	call_deferred("emit_signal", "initialized");
 }
 
 void RealSense::initialize(int width, int height, bool will_capture_color, bool will_capture_depth, bool will_capture_vertices) {
-	UtilityFunctions::print("Starting RealSense");
+	UtilityFunctions::print("Initializing RealSense");
 
 	number_of_pixels = width * height;
 
@@ -62,10 +62,11 @@ void RealSense::initialize(int width, int height, bool will_capture_color, bool 
 		}
 	}
 	// Start the camera thread
+	// Code shouldn't continue until the camera is started. So we are using a thread to start the camera and then join it.
 	std::thread camera_thread([this]() { start(); });
 	camera_thread.join();
 
-	UtilityFunctions::print("RealSense started");
+	UtilityFunctions::print("Initialization is complete");
 }
 
 void RealSense::configure_depth_cropping(float nearDistance, float farDistance, float downDistance, float upDistance, float leftDistance, float rightDistance, bool is_local) {
@@ -97,9 +98,11 @@ PackedVector3Array RealSense::get_vertices_data() {
 	return vertices_array;
 }
 
+// This function is called in a separate thread and continuously captures data from the camera
+// and emits signals when new data is available.
+// It will run until the is_running flag is set to false.
 void RealSense::fetch_data() {
 	UtilityFunctions::print("Starting data loop");
-
 	while (is_running) {
 		try {
 			// Capture a frame
@@ -123,13 +126,13 @@ void RealSense::fetch_data() {
 						int numberOfPoints = points.size();
 						// Calculate pitch and roll from accelerometer data
 						float pitch = atan2(motion_data.y, motion_data.z);
-						float roll = atan2(-motion_data.x, sqrt(motion_data.y*motion_data.y + motion_data.z*motion_data.z));
+						float roll = atan2(-motion_data.x, sqrt(motion_data.y * motion_data.y + motion_data.z * motion_data.z));
 						// We want to rotate to level
-						float target_pitch = -M_PI/2;
+						float target_pitch = -M_PI/2; // Target pitch is -90 degrees (horizontal)
 						float pitch_correction = pitch - target_pitch; // Negative pitch to level
-						float roll_correction = roll; // Target roll is 0
+						float roll_correction = roll; // Target roll is always 0
 
-							// Rotate each vertex
+						// Rotate each vertex
 						for (int i = 0; i < numberOfPoints; i++) {
 							rs2::vertex& vertex = const_cast<rs2::vertex&>(vertices[i]);
 							float x = vertex.x;
@@ -149,16 +152,15 @@ void RealSense::fetch_data() {
 						}
 					}
 					std::vector<bool> cropMask(number_of_pixels, false);
-					for (size_t i = 0; i < number_of_pixels; ++i)
-					{
-							const auto& vertex = vertices[i];
-							cropMask[i] =
-									vertex.z >= depth_cropping_config.near_distance &&
-									vertex.z <= depth_cropping_config.far_distance &&
-									vertex.y >= depth_cropping_config.down_distance &&
-									vertex.y <= depth_cropping_config.up_distance &&
-									vertex.x >= depth_cropping_config.left_distance &&
-									vertex.x <= depth_cropping_config.right_distance;
+					for (size_t i = 0; i < number_of_pixels; ++i) {
+						const auto& vertex = vertices[i];
+						cropMask[i] =
+							vertex.z >= depth_cropping_config.near_distance &&
+							vertex.z <= depth_cropping_config.far_distance &&
+							vertex.y >= depth_cropping_config.down_distance &&
+							vertex.y <= depth_cropping_config.up_distance &&
+							vertex.x >= depth_cropping_config.left_distance &&
+							vertex.x <= depth_cropping_config.right_distance;
 					}
 					for (int i = 0; i < size; i++) {
 						depth_byte_array[i * 2] = cropMask[i] ? depth_data[i] & 255 : 0;
