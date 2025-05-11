@@ -10,15 +10,11 @@ void vertex() {
 	float alpha = 1.f;
 	if (VERTEX.x < 0.05f || VERTEX.x > 1.55f || VERTEX.y < 0.05f || VERTEX.y > 1.15f) alpha = 0.f;
 	if (distance < 0.15f) alpha = 0.f;
-
-
 	//float distance = depth_value.r / 100.f;
 	//if (distance == 0.f) distance = 10000.0f;
 	VERTEX.z -= distance;
 	COLOR.xyz = vec3(distance);
 	COLOR.a = alpha;
-
-
 }
 
 void fragment() {
